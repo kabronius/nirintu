@@ -1,0 +1,12 @@
+#!/bin/sh
+# Calamares, last step inside the target: removes the live-only configuration.
+set -eu
+
+# greetd: Noctalia Greeter only, without the live autologin.
+cp /usr/share/nirintu/greetd-installed.toml /etc/greetd/config.toml
+
+rm -f /usr/bin/nirintu-installer /usr/share/applications/nirintu-installer.desktop
+rm -rf /etc/calamares /usr/share/nirintu/pool
+rm -f /usr/libexec/nirintu/bios-grub /usr/local/share/applications/calamares.desktop
+# Live-only empty-password keyring (users of the installed system get one from pam_gnome_keyring).
+rm -rf /etc/skel/.local/share/keyrings

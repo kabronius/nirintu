@@ -1,0 +1,6 @@
+[Desktop Entry]
+# Hides the launcher shipped by the calamares package; the live session uses nirintu-installer.desktop.
+Type=Application
+Name=Calamares
+Exec=calamares
+NoDisplay=true

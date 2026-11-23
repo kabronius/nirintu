@@ -1,0 +1,4 @@
+# snapd is never installed, not even as a dependency.
+Package: snapd
+Pin: release a=*
+Pin-Priority: -10

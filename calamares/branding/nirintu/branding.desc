@@ -1,0 +1,34 @@
+# Nirintu branding for Calamares. Colours follow Noctalia's default palette; logo.png, icon.png and
+# welcome.png are placeholders that the final logo replaces with the same names and sizes.
+---
+componentName: nirintu
+welcomeStyleCalamares: false
+welcomeExpandingLogo: false
+windowExpanding: normal
+windowSize: 1000px,640px
+windowPlacement: center
+sidebar: widget
+navigation: widget
+strings:
+    productName: "Nirintu"
+    shortProductName: "Nirintu"
+    version: "24.04 LTS"
+    shortVersion: "24.04"
+    versionedName: "Nirintu 24.04 LTS"
+    shortVersionedName: "Nirintu 24.04"
+    bootloaderEntryName: "Ubuntu"
+    productUrl: "https://github.com/kabronius/nirintu"
+    supportUrl: "https://github.com/kabronius/nirintu/issues"
+    knownIssuesUrl: "https://github.com/kabronius/nirintu/issues"
+    releaseNotesUrl: "https://github.com/kabronius/nirintu"
+images:
+    productIcon: "icon.png"
+    productLogo: "logo.png"
+    productWelcome: "welcome.png"
+style:
+    SidebarBackground: "#070722"
+    SidebarText: "#c9cae8"
+    SidebarTextCurrent: "#070722"
+    SidebarBackgroundCurrent: "#fff59b"
+slideshow: "show.qml"
+slideshowAPI: 2

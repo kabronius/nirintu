@@ -1,0 +1,115 @@
+/*
+ * Nirintu: dark Calamares theme with Noctalia's palette.
+ *   background #070722, surface #11112d, surface high #24234b, outline #3a3970
+ *   text #e6e6f8, dim text #9d9dc4, primary #fff59b, secondary #a9aefe
+ */
+
+#mainApp, QDialog, QMessageBox {
+    background-color: #11112d;
+    color: #e6e6f8;
+}
+
+QLabel, QCheckBox, QRadioButton, QGroupBox {
+    color: #e6e6f8;
+    background: transparent;
+}
+
+QScrollArea, QScrollArea > QWidget > QWidget, QStackedWidget, QTabWidget::pane {
+    background: transparent;
+    border: none;
+}
+
+QPushButton {
+    background-color: #24234b;
+    color: #e6e6f8;
+    border: 1px solid #3a3970;
+    border-radius: 8px;
+    padding: 6px 18px;
+}
+QPushButton:hover { background-color: #2f2e5e; }
+QPushButton:pressed { background-color: #3a3970; }
+QPushButton:disabled { color: #6e6d99; background-color: #17173a; border-color: #24234b; }
+
+/* Next / Install: primary action */
+QPushButton#view-button-next {
+    background-color: #fff59b;
+    color: #070722;
+    border: none;
+    font-weight: bold;
+}
+QPushButton#view-button-next:hover { background-color: #fffbc4; }
+QPushButton#view-button-next:disabled { background-color: #4a4830; color: #8a8770; }
+
+QLineEdit, QComboBox, QSpinBox, QTextEdit, QPlainTextEdit, QTextBrowser {
+    background-color: #070722;
+    color: #e6e6f8;
+    border: 1px solid #3a3970;
+    border-radius: 6px;
+    padding: 4px 8px;
+    selection-background-color: #a9aefe;
+    selection-color: #070722;
+}
+QLineEdit:focus, QComboBox:focus { border-color: #a9aefe; }
+
+QComboBox QAbstractItemView, QListView, QTreeView, QTableView {
+    background-color: #070722;
+    alternate-background-color: #0d0d2a;
+    color: #e6e6f8;
+    border: 1px solid #24234b;
+    selection-background-color: #a9aefe;
+    selection-color: #070722;
+}
+
+QHeaderView::section {
+    background-color: #24234b;
+    color: #e6e6f8;
+    border: none;
+    padding: 4px;
+}
+
+/* Thin bar without the percentage: no text colour is readable on both the yellow chunk and the dark
+   track, and the current step is written under the bar. */
+QProgressBar {
+    background-color: #24234b;
+    border: none;
+    border-radius: 4px;
+    color: transparent;
+    max-height: 8px;
+}
+QProgressBar::chunk { background-color: #fff59b; border-radius: 4px; }
+
+/* "Toggle log" next to the progress bar */
+QToolButton {
+    background: transparent;
+    color: #9d9dc4;
+    border: none;
+}
+QToolButton:hover { color: #e6e6f8; }
+
+QToolTip {
+    background-color: #24234b;
+    color: #e6e6f8;
+    border: 1px solid #3a3970;
+}
+
+/* Check boxes and radio buttons: the default indicators are dark on dark. */
+QCheckBox::indicator, QRadioButton::indicator {
+    width: 14px;
+    height: 14px;
+    border: 2px solid #a9aefe;
+    background-color: #070722;
+}
+QCheckBox::indicator { border-radius: 4px; }
+QRadioButton::indicator { border-radius: 9px; }
+QCheckBox::indicator:checked, QRadioButton::indicator:checked {
+    background-color: #fff59b;
+    border-color: #fff59b;
+}
+QCheckBox::indicator:disabled, QRadioButton::indicator:disabled { border-color: #3a3970; }
+
+/* Partition legend under the bars: Calamares paints its text in fixed dark colours, so the legend
+   keeps a light background. */
+PartitionLabelsView {
+    background-color: #e6e6f8;
+    border-radius: 6px;
+}

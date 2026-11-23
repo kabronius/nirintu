@@ -1,0 +1,4 @@
+# All interfaces are managed by NetworkManager.
+network:
+  version: 2
+  renderer: NetworkManager

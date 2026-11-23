@@ -1,0 +1,8 @@
+#!/bin/sh
+# Starts Calamares as root on the live user's Wayland display.
+if [ ! -d /cdrom/casper ]; then
+  echo "The installer runs only from the live session." >&2
+  exit 1
+fi
+exec sudo --preserve-env=WAYLAND_DISPLAY,XDG_RUNTIME_DIR,XDG_SESSION_TYPE,LANG,LANGUAGE \
+  env QT_QPA_PLATFORM=wayland calamares -D6 "$@"

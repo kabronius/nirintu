@@ -1,0 +1,18 @@
+#!/bin/sh
+# Calamares, BIOS firmware only, inside the target: the image ships grub-efi-amd64, which on a
+# BIOS machine would fail on every GRUB update. It is replaced with grub-pc from the local pool,
+# with install_devices preseeded to the disk that holds /boot.
+set -eu
+
+dev=$(findmnt -no SOURCE /boot 2>/dev/null || findmnt -no SOURCE /)
+# Walk up partition, LUKS and LVM layers to the whole disk.
+while [ "$(lsblk -dno TYPE "$dev")" != disk ]; do
+  parent=$(lsblk -no PKNAME "$dev" | head -n1)
+  [ -n "$parent" ] || { echo "cannot find the disk under $dev" >&2; exit 1; }
+  dev=/dev/$parent
+done
+
+echo "grub-pc grub-pc/install_devices multiselect $dev" | debconf-set-selections
+# dpkg, not apt: without package lists apt fails on several local .deb ("Pathname to install is
+# not absolute"). grub-pc Replaces and Conflicts grub-efi-amd64, so dpkg removes it in the same run.
+DEBIAN_FRONTEND=noninteractive dpkg -i /usr/share/nirintu/pool/*.deb

@@ -1,0 +1,10 @@
+[Desktop Entry]
+Type=Application
+Name=Install Nirintu
+Name[it]=Installa Nirintu
+Comment=Install the system on this computer
+Comment[it]=Installa il sistema su questo computer
+Exec=nirintu-installer
+Icon=nirintu
+Terminal=false
+Categories=System;

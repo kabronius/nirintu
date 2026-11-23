@@ -1,0 +1,116 @@
+#!/bin/sh
+# GRUB theme from distro-grub-themes, chosen from the machine's DMI data.
+#
+#   nirintu-grub-theme [auto|<theme>|none|list|detect] [--no-update]
+#
+# auto      theme for this machine's vendor and model (fallback when not recognised)
+# <theme>   one of the themes in /usr/share/nirintu/grub-themes
+# none      removes the theme, GRUB returns to the text menu
+# list      available themes, the detected one marked with *
+# detect    prints the detected theme and the DMI strings it is based on
+# --no-update  does not run update-grub (the installer runs grub-mkconfig itself)
+set -eu
+
+THEMES=/usr/share/nirintu/grub-themes
+DEST=/boot/grub/themes
+CFG=/etc/default/grub.d/90-nirintu-theme.cfg
+FALLBACK=$(cat "$THEMES/FALLBACK" 2>/dev/null || echo ubuntu)
+
+dmi() { tr '[:upper:]' '[:lower:]' < "/sys/class/dmi/id/$1" 2>/dev/null || true; }
+
+detect() {
+  vendor=$(dmi sys_vendor)
+  case "$vendor" in
+    ""|*"to be filled"*|*"default string"*|*"system manufacturer"*|*"o.e.m."*) vendor=$(dmi board_vendor) ;;
+  esac
+  # Padded with spaces so that short names match whole words only.
+  model=" $(dmi product_name) $(dmi product_version) $(dmi product_family) $(dmi board_name) "
+  case "$vendor" in
+    *lenovo*)
+      case "$model" in *thinkpad*) t=thinkpad ;; *legion*) t=legion ;; *) t=lenovo ;; esac ;;
+    *asus*)
+      case "$model" in *" rog "*|*" rog-"*) t=asus-rog ;; *" tuf "*|*" tuf-"*) t=asus-tuf ;; *) t=asus ;; esac ;;
+    hp|"hp "*|*hewlett*)
+      case "$model" in *omen*) t=hp-omen ;; *victus*) t=hp-victus ;; *) t=hp ;; esac ;;
+    *gigabyte*)
+      case "$model" in *aorus*) t=aorus ;; *) t=gigabyte ;; esac ;;
+    *framework*)
+      case "$model" in *"laptop 13"*) t=framework13 ;; *) t=framework ;; esac ;;
+    *dell*|*alienware*) t=dell ;;
+    *acer*) t=acer ;;
+    *micro-star*|msi) t=msi ;;
+    *asrock*) t=asrock ;;
+    *razer*) t=razer ;;
+    *system76*) t=system76 ;;
+    *samsung*) t=samsung ;;
+    *huawei*) t=huawei ;;
+    lg|*"lg electronics"*) t=lg ;;
+    *toshiba*|*dynabook*) t=toshiba ;;
+    *fujitsu*) t=fujitsu ;;
+    *medion*) t=medion ;;
+    *sony*|*vaio*) t=vaio ;;
+    *supermicro*) t=supermicro ;;
+    *apple*) t=apple ;;
+    *) t=$FALLBACK ;;
+  esac
+  [ -f "$THEMES/$t.tar" ] || t=$FALLBACK
+  echo "$t"
+}
+
+update() { [ "$no_update" = 1 ] || update-grub; }
+
+install_theme() { # name
+  [ -f "$THEMES/$1.tar" ] || { echo "unknown theme: $1 (see: $0 list)" >&2; exit 1; }
+  remove_themes
+  mkdir -p "$DEST/$1" "$(dirname "$CFG")"
+  tar -xf "$THEMES/$1.tar" -C "$DEST/$1" --no-same-owner
+  cat > "$CFG" <<EOF
+# Written by nirintu-grub-theme
+GRUB_THEME="$DEST/$1/theme.txt"
+GRUB_GFXMODE="auto"
+GRUB_TIMEOUT_STYLE="menu"
+GRUB_TIMEOUT="5"
+EOF
+  echo "GRUB theme: $1"
+  update
+}
+
+# Only the themes this tool manages; anything else in $DEST is left alone.
+remove_themes() {
+  for tar in "$THEMES"/*.tar; do
+    rm -rf "${DEST:?}/$(basename "$tar" .tar)"
+  done
+}
+
+[ "$(id -u)" = 0 ] || [ "${1:-auto}" = list ] || [ "${1:-auto}" = detect ] || { echo "run as root" >&2; exit 1; }
+
+action=${1:-auto}
+no_update=0
+[ "${2:-}" = --no-update ] && no_update=1
+
+case "$action" in
+  auto) install_theme "$(detect)" ;;
+  none)
+    remove_themes
+    rm -f "$CFG"
+    echo "GRUB theme removed"
+    update
+    ;;
+  list)
+    d=$(detect)
+    for tar in "$THEMES"/*.tar; do
+      n=$(basename "$tar" .tar)
+      if [ "$n" = "$d" ]; then echo "* $n"; else echo "  $n"; fi
+    done
+    ;;
+  detect)
+    echo "sys_vendor:     $(dmi sys_vendor)"
+    echo "board_vendor:   $(dmi board_vendor)"
+    echo "product_name:   $(dmi product_name)"
+    echo "product_version:$(dmi product_version)"
+    echo "product_family: $(dmi product_family)"
+    echo "theme:          $(detect)"
+    ;;
+  -h|--help) sed -n '2,13p' "$0" | sed 's/^# \{0,1\}//' ;;
+  *) install_theme "$action" ;;
+esac

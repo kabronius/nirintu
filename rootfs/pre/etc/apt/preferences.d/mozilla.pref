@@ -1,0 +1,8 @@
+# Firefox from the Mozilla APT repository; Ubuntu's firefox package is only a snap wrapper.
+Package: *
+Pin: origin packages.mozilla.org
+Pin-Priority: 1000
+
+Package: firefox*
+Pin: release o=Ubuntu
+Pin-Priority: -1
