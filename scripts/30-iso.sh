@@ -25,7 +25,7 @@ mksquashfs "$CHROOT" "$ISO_TREE/casper/filesystem.squashfs" -noappend -wildcards
   -e 'proc/*' -e 'sys/*' -e 'dev/*' -e 'run/*' -e 'tmp/*' $SQUASHFS_COMP
 
 date_tag=$(date -u +%Y%m%d)
-echo "$DISTRO_NAME $DISTRO_VERSION LTS \"$date_tag\" - amd64 ($date_tag)" > "$ISO_TREE/.disk/info"
+echo "$DISTRO_NAME $NIRINTU_VERSION LTS \"$date_tag\" - amd64 ($date_tag)" > "$ISO_TREE/.disk/info"
 touch "$ISO_TREE/.disk/base_installable"
 echo "full_cd/single" > "$ISO_TREE/.disk/cd_type"
 
@@ -78,7 +78,7 @@ grub-mkimage -O i386-pc-eltorito -p /boot/grub -o "$ISO_TREE/boot/grub/i386-pc/e
   search_label linux echo test ls cat chain reboot halt all_video gfxterm font
 
 log "iso"
-iso="$OUT/$ISO_BASENAME-$date_tag.iso"
+iso="$OUT/$ISO_BASENAME.iso"
 rm -f "$iso" "$iso.sha256"
 xorriso -as mkisofs -r -V "$ISO_LABEL" -o "$iso" -J -joliet-long -l -iso-level 3 \
   --grub2-mbr /usr/lib/grub/i386-pc/boot_hybrid.img \
@@ -89,6 +89,6 @@ xorriso -as mkisofs -r -V "$ISO_LABEL" -o "$iso" -J -joliet-long -l -iso-level 3
   -eltorito-alt-boot -e '--interval:appended_partition_2:all::' -no-emul-boot \
   "$ISO_TREE"
 (cd "$OUT" && sha256sum "$(basename "$iso")" > "$(basename "$iso").sha256")
-cp "$ISO_TREE/casper/filesystem.manifest" "$OUT/$ISO_BASENAME-$date_tag.manifest"
+cp "$ISO_TREE/casper/filesystem.manifest" "$OUT/$ISO_BASENAME.manifest"
 give_back "$OUT"
 log "$iso ($(du -h "$iso" | cut -f1))"

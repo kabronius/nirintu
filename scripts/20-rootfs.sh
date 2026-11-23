@@ -74,6 +74,12 @@ cp "$DEBS"/*.deb "$CHROOT/tmp/debs/"
 in_chroot sh -c 'apt-get install -y /tmp/debs/*.deb'
 rm -rf "$CHROOT/tmp/debs"
 cp "$DEBS/SOURCES" "$CHROOT/usr/share/doc/nirintu-sources.txt"
+# Version of the image, for bug reports: release, commit of this repository, build date.
+cat > "$CHROOT/etc/nirintu-release" <<EOF
+NIRINTU_VERSION=$NIRINTU_VERSION
+NIRINTU_COMMIT=$(git -c safe.directory=/src -C /src rev-parse --short HEAD 2>/dev/null || echo unknown)
+NIRINTU_BUILD_DATE=$(date -u +%Y-%m-%d)
+EOF
 
 in_chroot dpkg -l snapd 2>/dev/null | grep -q '^ii' && die "snapd ended up in the image"
 
