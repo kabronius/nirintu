@@ -79,6 +79,7 @@ xdg-user-dirs
 xdg-utils
 adwaita-icon-theme
 papirus-icon-theme
+librsvg2-common
 dconf-gsettings-backend
 gsettings-desktop-schemas
 fonts-noto-core

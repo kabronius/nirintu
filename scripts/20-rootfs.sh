@@ -59,6 +59,9 @@ pkgs+=("linux-$KERNEL_FLAVOUR")
 if [[ -n "$NVIDIA_DRIVER" ]]; then
   pkgs+=("nvidia-driver-$NVIDIA_DRIVER" "linux-modules-nvidia-$NVIDIA_DRIVER-$KERNEL_FLAVOUR")
 fi
+for lang in $LANGUAGE_PACKS; do
+  pkgs+=("language-pack-$lang" "language-pack-gnome-$lang")
+done
 # shellcheck disable=SC2206
 pkgs+=($EXTRA_PACKAGES)
 in_chroot apt-get update
