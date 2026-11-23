@@ -5,6 +5,19 @@ Ubuntu with niri and Noctalia: live and installer ISO of Ubuntu 24.04 LTS (noble
 shell and the [Noctalia Greeter](https://github.com/kabronius/noctalia-greeter) on greetd.
 Installation is done by Calamares; the NVIDIA driver from the Ubuntu archive is included.
 
+## Screenshots
+
+| | |
+| --- | --- |
+| ![niri with Alacritty and Nautilus in two columns, Noctalia bar](docs/screenshots/desktop.png) | ![Noctalia launcher](docs/screenshots/launcher.png) |
+| Live session: niri columns, Noctalia bar, Papirus icons | Noctalia launcher (`Super+D`) |
+| ![Calamares welcome page](docs/screenshots/installer-welcome.png) | ![Calamares partitioning page](docs/screenshots/installer-partitions.png) |
+| Installer, welcome page | Installer, partitioning |
+| ![Calamares slideshow during installation](docs/screenshots/installer-slideshow.png) | ![Noctalia Greeter](docs/screenshots/greeter.png) |
+| Installer, slideshow during the installation | Noctalia Greeter on the installed system |
+| ![GRUB menu with the ThinkPad theme](docs/screenshots/grub-thinkpad.png) | |
+| GRUB theme picked for a ThinkPad | |
+
 ## Contents of the image
 
 | Area | Content |
@@ -13,6 +26,7 @@ Installation is done by Calamares; the NVIDIA driver from the Ubuntu archive is 
 | Snap | `snapd` pinned to priority -10: never installed, not even as a dependency |
 | Graphics | Mesa, `nvidia-driver-580` with Canonical-signed prebuilt modules (`linux-modules-nvidia-580-generic-hwe-24.04`, valid with Secure Boot) |
 | Session | niri, xwayland-satellite, Noctalia (`--daemon` from niri), xdg-desktop-portal-gnome/gtk, gnome-keyring, PipeWire |
+| Translations | `language-pack-*` and `language-pack-gnome-*` for `LANGUAGE_PACKS` (default `en it`), included because the installer is offline |
 | Icons | Papirus (`ICON_THEME`, default `Papirus-Dark`) as gsettings default and in `/etc/gtk-{3,4}.0/settings.ini`; Noctalia reads the same gsettings key |
 | GRUB | theme from [distro-grub-themes](https://github.com/AdisonCavani/distro-grub-themes) chosen by vendor and model at install time (`nirintu-grub-theme`) |
 | Login | greetd on VT 7 with Noctalia Greeter (`_greetd`); in the live session one autologin through `initial_session` |
@@ -39,15 +53,8 @@ privileged `ubuntu:24.04` container built from [docker/Dockerfile](docker/Docker
 ./build.sh clean      # removes chroot, ISO tree and output; keeps sources, cargo cache and .deb
 ```
 
-Output: `$WORKDIR/out/nirintu-24.04-amd64-<date>.iso` with `.sha256` and the package manifest.
+Output: `$WORKDIR/out/nirintu-<NIRINTU_VERSION>-amd64.iso` with `.sha256` and the package manifest.
 Settings are in [config.env](config.env); local overrides go in `config.local.env` (ignored by git).
-
-```mermaid
-flowchart LR
-  A[10-packages.sh<br/>niri, xwayland-satellite,<br/>noctalia, noctalia-greeter] -->|$WORKDIR/debs| B[20-rootfs.sh<br/>debootstrap + apt<br/>+ configuration]
-  B -->|$WORKDIR/chroot| C[30-iso.sh<br/>squashfs, GRUB,<br/>xorriso]
-  C --> D[(ISO)]
-```
 
 ### Stage 1: packages
 
@@ -170,10 +177,25 @@ sudo nirintu-grub-theme auto       # back to the detected one
 sudo nirintu-grub-theme none       # text menu
 ```
 
+## Releases
+
+Versions are `<Ubuntu base>.<Nirintu release>` (`NIRINTU_VERSION` in `config.env`, history in
+[CHANGELOG.md](CHANGELOG.md)). Pushing the tag `v$NIRINTU_VERSION` runs
+[.github/workflows/release.yml](.github/workflows/release.yml) on a GitHub-hosted runner:
+
+1. the tag must match `NIRINTU_VERSION` and `CHANGELOG.md` must have a section for it;
+2. `./build.sh all` builds the ISO from scratch in `/mnt` (the runner's larger disk);
+3. a GitHub release is created with the CHANGELOG section as notes and two files: the package manifest of the
+   image and the commits of niri, xwayland-satellite, Noctalia and Noctalia Greeter.
+
+The ISO is not attached: GitHub limits release files to 2 GiB and the image is about 2.5 GB. The same workflow can
+be started by hand (`workflow_dispatch`) to check the build without publishing. Inside the image
+`/etc/nirintu-release` records the version, the commit of this repository and the build date.
+
 ## Testing in QEMU
 
 ```sh
-iso=/var/tmp/nirintu/out/nirintu-24.04-amd64-*.iso
+iso=/var/tmp/nirintu/out/nirintu-*-amd64.iso
 qemu-img create -f qcow2 /var/tmp/nirintu-test.qcow2 30G
 # UEFI (OVMF from the ovmf package)
 qemu-system-x86_64 -enable-kvm -m 6G -smp 4 -cpu host \
@@ -194,6 +216,7 @@ OpenGL ES; without `virtio-vga-gl` it falls back to software rendering (pixman) 
 | Noctalia or greeter branch | `NOCTALIA_REF`, `GREETER_REF` (the branches carry the noble port; see their READMEs for rebasing) |
 | NVIDIA branch, none | `NVIDIA_DRIVER` (`""` for Mesa only) |
 | Additional packages | `packages.list` or `EXTRA_PACKAGES` |
+| Languages | `LANGUAGE_PACKS` |
 | Icon theme | `ICON_THEME` (any theme installed by `packages.list`) |
 | GRUB themes | `GRUB_THEMES`, `GRUB_THEMES_COMMIT`, `GRUB_THEME_FALLBACK` (`GRUB_THEMES=""` for the text menu) |
 | Live language and layout | `LIVE_LOCALE`, `LIVE_KEYMAP`, `LIVE_TIMEZONE` |
